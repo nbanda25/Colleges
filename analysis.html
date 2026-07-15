@@ -80,11 +80,7 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Where students go to college and what they pay for it varies enormously, and so does the likelihood that they will finish. We help today’s students choose by examining how graduation rate varies with tuition and selectivity, using 2013 IPEDS data on roughly 900 US four-year colleges and universities — the most recent reliable national snapshot we have. We model graduation rate as a linear function of tuition and selectivity tier, using a normal probability distribution and an identity link function. However, a potential weakness is the assumption of stability, as the relationship between tuition and graduation rates may have changed over the thirteen-year gap between 2013 and 2026.</p>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
-</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -93,36 +89,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>parsnip model object
-
-
-Call:
-stats::lm(formula = grad_rate ~ tuition + selectivity, data = data)
-
-Coefficients:
-                    (Intercept)                          tuition  
-                        0.48662                          0.08968  
-    selectivityHighly Selective  selectivityModerately Selective  
-                       -0.07840                         -0.12765  
-     selectivityLowly Selective         selectivityNon-selective  
-                       -0.21320                         -0.20546  </code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 7
-  term                  estimate std.error statistic  p.value conf.low conf.high
-  &lt;chr&gt;                    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-1 (Intercept)             0.487    0.0390      12.5  1.70e-31   0.410     0.563 
-2 tuition                 0.0897   0.00806     11.1  4.97e-26   0.0738    0.106 
-3 selectivityHighly Se…  -0.0784   0.0180      -4.35 1.66e- 5  -0.114    -0.0430
-4 selectivityModeratel…  -0.128    0.0172      -7.44 4.16e-13  -0.161    -0.0939
-5 selectivityLowly Sel…  -0.213    0.0190     -11.2  2.19e-26  -0.251    -0.176 
-6 selectivityNon-selec…  -0.205    0.0331      -6.20 1.12e- 9  -0.271    -0.140 </code></pre>
-</div>
-</div>
+<p>Where students go to college and what they pay for it varies enormously, and so does the likelihood that they will finish. We help today’s students choose by examining how graduation rate varies with tuition and selectivity, using 2013 IPEDS data on roughly 900 US four-year colleges and universities — the most recent reliable national snapshot we have. The 13-year gap between our data and the question is a real concern: tuition has risen much faster than inflation since 2013, and the price/graduation relationship may have shifted. We model graduation rate as a normally distributed variable which is a linear function of tuition and selectivity. We estimate that within a given selectivity tier, each $10,000 of tuition is associated with about 9 percentage points higher graduation rate, with a 95% confidence interval of 7 to 11 percentage points; Elite colleges have graduation rates about 20 percentage points higher than Lowly Selective ones at comparable tuition.</p>
 
 </main>
 <!-- /main column -->
