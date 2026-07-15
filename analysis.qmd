@@ -6,35 +6,16 @@ execute:
   echo: false
 ---
 
-Where students go to college and what they pay for it varies enormously, and so does the likelihood that they will finish. We help today’s students choose by examining how graduation rate varies with tuition and selectivity, using 2013 IPEDS data on roughly 900 US four-year colleges and universities — the most recent reliable national snapshot we have. We model graduation rate as a linear function of tuition and selectivity tier, using a normal probability distribution and an identity link function. However, a potential weakness is the assumption of stability, as the relationship between tuition and graduation rates may have changed over the thirteen-year gap between 2013 and 2026.
-
 ```{r setup}
 #| message: false
 library(tidyverse)
-library(primer.data)
 library(tidymodels)
+library(primer.data)
 library(broom)
+library(marginaleffects)
 ```
 
-```{r plot}
-colleges |>
-  filter(tuition > 2) |>
-  drop_na(grad_rate, tuition) |>
-  ggplot(aes(x = tuition, y = grad_rate)) +
-  geom_point(alpha = 0.4, color = "grey30") +
-  geom_smooth(method = "lm", color = "steelblue", se = FALSE) +
-  scale_x_continuous(labels = scales::label_dollar(scale = 10000)) +
-  scale_y_continuous(labels = scales::label_percent()) +
-  labs(
-    title = "Graduation Rate by Tuition",
-    subtitle = "Higher-tuition colleges tend to have higher graduation rates",
-    x = "Tuition", y = "Graduation Rate",
-    caption = "Source: IPEDS 2013 via primer.data"
-  ) +
-  theme_minimal()
-```
-
-```{r}
+```{r prep}
 #| cache: true
 x <- colleges |>
   select(tuition, grad_rate, selectivity) |>
@@ -46,19 +27,27 @@ x <- colleges |>
                                          "Lowly Selective", "Non-selective")))
 ```
 
-```{r}
-linear_reg(engine = "lm") |>
-  fit(grad_rate ~ tuition + selectivity, data = x)
-```
-
-```{r}
+```{r fit_model}
 #| cache: true
 fit_colleges <- linear_reg() |>
   set_engine("lm") |>
   fit(grad_rate ~ tuition + selectivity, data = x)
 ```
 
-```{r}
-tidy(fit_colleges, conf.int = TRUE)
+```{r plot}
+plot_predictions(fit_colleges, condition = c("tuition", "selectivity"), draw = FALSE) |>
+  ggplot(aes(x = tuition, y = estimate, color = selectivity)) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = selectivity),
+              alpha = 0.15, color = NA) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Predicted Graduation Rate by Tuition and Selectivity",
+    subtitle = "Within each selectivity tier, every $10k of tuition adds ~9 percentage points",
+    x = "Tuition ($10,000)", y = "Predicted Graduation Rate",
+    color = "Selectivity", fill = "Selectivity",
+    caption = "Source: IPEDS 2013 via primer.data"
+  ) +
+  theme_minimal()
 ```
 
+Where students go to college and what they pay for it varies enormously, and so does the likelihood that they will finish. We help today's students choose by examining how graduation rate varies with tuition and selectivity, using 2013 IPEDS data on roughly 900 US four-year colleges and universities --- the most recent reliable national snapshot we have. The 13-year gap between our data and the question is a real concern: tuition has risen much faster than inflation since 2013, and the price/graduation relationship may have shifted. We model graduation rate as a normally distributed variable which is a linear function of tuition and selectivity. We estimate that within a given selectivity tier, each $10,000 of tuition is associated with about 9 percentage points higher graduation rate, with a 95% confidence interval of 7 to 11 percentage points; Elite colleges have graduation rates about 20 percentage points higher than Lowly Selective ones at comparable tuition.
