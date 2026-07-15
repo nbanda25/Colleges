@@ -5,7 +5,8 @@ date: "July 14, 2026"
 execute:
   echo: false
 ---
-Where students go to college and what they pay for it varies enormously, and so does the likelihood that they will finish. We help today’s students choose by examining how graduation rate varies with tuition and selectivity, using 2013 IPEDS data on roughly 900 US four-year colleges and universities — the most recent reliable national snapshot we have. However, a potential weakness is the assumption of stability, as the relationship between tuition and graduation rates may have changed over the thirteen-year gap between 2013 and 2026.
+
+Where students go to college and what they pay for it varies enormously, and so does the likelihood that they will finish. We help today’s students choose by examining how graduation rate varies with tuition and selectivity, using 2013 IPEDS data on roughly 900 US four-year colleges and universities — the most recent reliable national snapshot we have. We model graduation rate as a linear function of tuition and selectivity tier, using a normal probability distribution and an identity link function. However, a potential weakness is the assumption of stability, as the relationship between tuition and graduation rates may have changed over the thirteen-year gap between 2013 and 2026.
 
 ```{r setup}
 #| message: false
@@ -43,5 +44,21 @@ x <- colleges |>
                               levels = c("Elite", "Highly Selective",
                                          "Moderately Selective",
                                          "Lowly Selective", "Non-selective")))
+```
+
+```{r}
+linear_reg(engine = "lm") |>
+  fit(grad_rate ~ tuition + selectivity, data = x)
+```
+
+```{r}
+#| cache: true
+fit_colleges <- linear_reg() |>
+  set_engine("lm") |>
+  fit(grad_rate ~ tuition + selectivity, data = x)
+```
+
+```{r}
+tidy(fit_colleges, conf.int = TRUE)
 ```
 
