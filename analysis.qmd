@@ -1,0 +1,47 @@
+---
+title: "Colleges"
+author: "Niket Banda"
+date: "July 14, 2026"
+execute:
+  echo: false
+---
+Where students go to college and what they pay for it varies enormously, and so does the likelihood that they will finish. We help today’s students choose by examining how graduation rate varies with tuition and selectivity, using 2013 IPEDS data on roughly 900 US four-year colleges and universities — the most recent reliable national snapshot we have. However, a potential weakness is the assumption of stability, as the relationship between tuition and graduation rates may have changed over the thirteen-year gap between 2013 and 2026.
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(primer.data)
+library(tidymodels)
+library(broom)
+```
+
+```{r plot}
+colleges |>
+  filter(tuition > 2) |>
+  drop_na(grad_rate, tuition) |>
+  ggplot(aes(x = tuition, y = grad_rate)) +
+  geom_point(alpha = 0.4, color = "grey30") +
+  geom_smooth(method = "lm", color = "steelblue", se = FALSE) +
+  scale_x_continuous(labels = scales::label_dollar(scale = 10000)) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  labs(
+    title = "Graduation Rate by Tuition",
+    subtitle = "Higher-tuition colleges tend to have higher graduation rates",
+    x = "Tuition", y = "Graduation Rate",
+    caption = "Source: IPEDS 2013 via primer.data"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+#| cache: true
+x <- colleges |>
+  select(tuition, grad_rate, selectivity) |>
+  filter(tuition > 2) |>
+  drop_na() |>
+  mutate(selectivity = factor(as.character(selectivity),
+                              levels = c("Elite", "Highly Selective",
+                                         "Moderately Selective",
+                                         "Lowly Selective", "Non-selective")))
+```
+
